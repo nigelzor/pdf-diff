@@ -465,6 +465,8 @@ def main():
                         help='bottom margin (ignored area) begin in percent of page height (default 100.0)')
     parser.add_argument('-r', '--result-width', default=900, type=int,
                         help='width of the result image (width of image in px)')
+    parser.add_argument('-q', '--brief', action='store_true', default=False,
+                        help='output only whether files differ')
     args = parser.parse_args()
 
     def invalid_usage(msg):
@@ -495,6 +497,14 @@ def main():
         invalid_usage('Insufficient number of files to compare; please supply exactly 2.')
 
     changes = compute_changes(args.files[0], args.files[1], top_margin=float(args.top_margin), bottom_margin=float(args.bottom_margin))
+
+    if args.brief:
+        if len(changes):
+            print('Files {} and {} differ'.format(args.files[0], args.files[1]))
+            sys.exit(1)
+        else:
+            sys.exit(0)
+
     img = render_changes(changes, style, args.result_width)
     img.save(sys.stdout.buffer, args.format.upper())
 
